@@ -44,6 +44,12 @@ class SocialAuthController extends Controller
             ]);
         }
 
+        if (empty($socialiteUser->getEmail())) {
+            return redirect()->route('login')->withErrors([
+                'email' => 'No email address was returned by '.ucfirst($provider).'. Please check your provider account settings or try another sign-in method.',
+            ]);
+        }
+
         $user = User::findOrCreateFromSocialite($provider, $socialiteUser);
 
         Auth::login($user, remember: true);

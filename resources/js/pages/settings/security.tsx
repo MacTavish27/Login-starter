@@ -14,12 +14,14 @@ import { edit } from '@/routes/security';
 
 type Props = {
     passwordRules: string;
+    hasPassword?: boolean;
 } & ManagePasskeysProps &
     ManageTwoFactorProps;
 
 export default function Security(props: Props) {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
+    const hasPassword = props.hasPassword ?? true;
 
     return (
         <>
@@ -30,8 +32,12 @@ export default function Security(props: Props) {
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Update password"
-                    description="Ensure your account is using a long, random password to stay secure"
+                    title={hasPassword ? 'Update password' : 'Set password'}
+                    description={
+                        hasPassword
+                            ? 'Ensure your account is using a long, random password to stay secure'
+                            : 'Add a password to your account so you can sign in using your email and password'
+                    }
                 />
 
                 <Form
@@ -39,11 +45,11 @@ export default function Security(props: Props) {
                     options={{
                         preserveScroll: true,
                     }}
-                    resetOnError={[
-                        'password',
-                        'password_confirmation',
-                        'current_password',
-                    ]}
+                    resetOnError={
+                        hasPassword
+                            ? ['password', 'password_confirmation', 'current_password']
+                            : ['password', 'password_confirmation']
+                    }
                     resetOnSuccess
                     onError={(errors) => {
                         if (errors.password) {
@@ -58,25 +64,29 @@ export default function Security(props: Props) {
                 >
                     {({ errors, processing }) => (
                         <>
+                            {hasPassword && (
+                                <div className="grid gap-2">
+                                    <Label htmlFor="current_password">
+                                        Current password
+                                    </Label>
+
+                                    <PasswordInput
+                                        id="current_password"
+                                        ref={currentPasswordInput}
+                                        name="current_password"
+                                        className="mt-1 block w-full"
+                                        autoComplete="current-password"
+                                        placeholder="Current password"
+                                    />
+
+                                    <InputError message={errors.current_password} />
+                                </div>
+                            )}
+
                             <div className="grid gap-2">
-                                <Label htmlFor="current_password">
-                                    Current password
+                                <Label htmlFor="password">
+                                    {hasPassword ? 'New password' : 'Password'}
                                 </Label>
-
-                                <PasswordInput
-                                    id="current_password"
-                                    ref={currentPasswordInput}
-                                    name="current_password"
-                                    className="mt-1 block w-full"
-                                    autoComplete="current-password"
-                                    placeholder="Current password"
-                                />
-
-                                <InputError message={errors.current_password} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">New password</Label>
 
                                 <PasswordInput
                                     id="password"

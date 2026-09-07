@@ -63,3 +63,33 @@ test('an existing account is linked by email instead of duplicated', function ()
         ->provider->toBe('github')
         ->provider_id->toBe('github-123');
 });
+
+test('callback fails gracefully when no email is returned by provider', function () {
+    Socialite::fake('github', fakeSocialiteUser([
+        'email' => null,
+    ]));
+
+    $response = $this->get('/auth/github/callback');
+
+    $response->assertRedirect(route('login'));
+    $response->assertSessionHasErrors('email');
+    $this->assertGuest();
+});
+
+test('existing user logs in via existing provider and provider id', function () {
+    $user = User::factory()->create([
+        'email' => 'jason@example.com',
+        'provider' => 'github',
+        'provider_id' => 'github-123',
+    ]);
+
+    Socialite::fake('github', fakeSocialiteUser([
+        'id' => 'github-123',
+        'email' => 'jason-new@example.com',
+    ]));
+
+    $response = $this->get('/auth/github/callback');
+
+    $response->assertRedirect(route('dashboard', absolute: false));
+    $this->assertAuthenticatedAs($user->fresh());
+});

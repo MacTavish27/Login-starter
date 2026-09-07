@@ -22,30 +22,52 @@ class User extends Authenticatable implements PasskeyUser
     use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
     /**
+     * Determine if the user has a password set.
+     */
+    public function hasPassword(): bool
+    {
+        return ! is_null($this->password);
+    }
+
+    /**
      * Find an existing user for the given OAuth identity, or create one.
      *
-     * Existing accounts are matched by email so that a user who first signed
-     * up with a password can later link a social provider to the same account.
+     * Existing accounts are matched first by provider and provider ID,
+     * and second by email so that a user who first signed up with a
+     * password can later link a social provider to the same account.
      */
     public static function findOrCreateFromSocialite(string $provider, SocialiteUser $socialiteUser): self
     {
+        $email = $socialiteUser->getEmail();
+
         $user = static::query()
-            ->where('email', $socialiteUser->getEmail())
+            ->where('provider', $provider)
+            ->where('provider_id', $socialiteUser->getId())
             ->first();
+
+        if (! $user && $email) {
+            $user = static::query()
+                ->where('email', $email)
+                ->first();
+        }
 
         if ($user) {
             $user->fill([
                 'provider' => $provider,
                 'provider_id' => $socialiteUser->getId(),
-                'avatar' => $socialiteUser->getAvatar(),
+                'avatar' => $socialiteUser->getAvatar() ?? $user->avatar,
             ])->save();
+
+            if (! $user->email_verified_at) {
+                $user->forceFill(['email_verified_at' => now()])->save();
+            }
 
             return $user;
         }
 
         $user = static::create([
             'name' => $socialiteUser->getName() ?? $socialiteUser->getNickname() ?? 'User',
-            'email' => $socialiteUser->getEmail(),
+            'email' => $email,
             'provider' => $provider,
             'provider_id' => $socialiteUser->getId(),
             'avatar' => $socialiteUser->getAvatar(),
