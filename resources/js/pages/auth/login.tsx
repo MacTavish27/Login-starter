@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
@@ -23,33 +24,32 @@ export default function Login({ status, canResetPassword }: Props) {
         <>
             <Head title="Log in" />
 
-            <PasskeyVerify />
+            <div className="flex flex-col gap-3">
+                <SocialLoginButtons />
+                <PasskeyVerify separator={null} />
+            </div>
 
-            <SocialLoginButtons />
-
-            <div className="flex items-center gap-3">
-                <span className="h-px flex-1 bg-gradient-to-r from-transparent to-cyan-400/40" />
-                <span className="font-mono text-[10px] tracking-[0.2em] text-slate-500 uppercase">
-                    or continue with email
-                </span>
-                <span className="h-px flex-1 bg-gradient-to-l from-transparent to-fuchsia-400/40" />
+            <div className="relative my-1">
+                <div className="absolute inset-0 flex items-center">
+                    <Separator className="w-full" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">
+                        Or continue with email
+                    </span>
+                </div>
             </div>
 
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-5"
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
+                        <div className="grid gap-4">
                             <div className="grid gap-2">
-                                <Label
-                                    htmlFor="email"
-                                    className="font-mono text-xs tracking-wider text-slate-300 uppercase"
-                                >
-                                    Email address
-                                </Label>
+                                <Label htmlFor="email">Email address</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -59,23 +59,17 @@ export default function Login({ status, canResetPassword }: Props) {
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="email@example.com"
-                                    className="border-cyan-400/15 bg-white/[0.02] text-white focus-visible:border-cyan-400/70 focus-visible:ring-cyan-400/40"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label
-                                        htmlFor="password"
-                                        className="font-mono text-xs tracking-wider text-slate-300 uppercase"
-                                    >
-                                        Password
-                                    </Label>
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="password">Password</Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-sm text-cyan-300 hover:text-cyan-200"
+                                            className="text-xs text-muted-foreground hover:text-foreground"
                                             tabIndex={5}
                                         >
                                             Forgot your password?
@@ -89,21 +83,19 @@ export default function Login({ status, canResetPassword }: Props) {
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Password"
-                                    className="border-cyan-400/15 bg-white/[0.02] focus-visible:border-cyan-400/70 focus-visible:ring-cyan-400/40 text-white"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-2">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
-                                    className="data-[state=checked]:border-cyan-400 data-[state=checked]:bg-cyan-500"
                                 />
                                 <Label
                                     htmlFor="remember"
-                                    className="text-slate-300"
+                                    className="cursor-pointer text-sm font-normal text-muted-foreground"
                                 >
                                     Remember me
                                 </Label>
@@ -111,7 +103,7 @@ export default function Login({ status, canResetPassword }: Props) {
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full border-0 bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-white shadow-[0_0_24px_-4px_rgba(34,211,238,0.7)] transition-all hover:from-cyan-400 hover:to-fuchsia-400 hover:shadow-[0_0_30px_-2px_rgba(217,70,239,0.65)]"
+                                className="mt-2 w-full"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -121,12 +113,12 @@ export default function Login({ status, canResetPassword }: Props) {
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-slate-400">
+                        <div className="text-center text-sm text-muted-foreground">
                             Don't have an account?{' '}
                             <TextLink
                                 href={register()}
-                                className="text-cyan-300 hover:text-cyan-200"
-                                tabIndex={5}
+                                className="font-medium text-foreground underline underline-offset-4 hover:text-primary"
+                                tabIndex={6}
                             >
                                 Sign up
                             </TextLink>
@@ -136,7 +128,7 @@ export default function Login({ status, canResetPassword }: Props) {
             </Form>
 
             {status && (
-                <div className="text-center text-sm font-medium text-cyan-400">
+                <div className="rounded-md border border-green-200 bg-green-50 p-3 text-center text-sm font-medium text-green-700 dark:border-green-900/50 dark:bg-green-950/40 dark:text-green-300">
                     {status}
                 </div>
             )}
@@ -145,6 +137,6 @@ export default function Login({ status, canResetPassword }: Props) {
 }
 
 Login.layout = {
-    title: 'Access Console',
-    description: 'Authenticate to continue to your dashboard',
+    title: 'Welcome back',
+    description: 'Enter your credentials to access your account',
 };

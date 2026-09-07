@@ -61,14 +61,14 @@ const providers: Provider[] = [
 
 export default function SocialLoginButtons() {
     return (
-        <div className="grid gap-3">
+        <div className="grid gap-2.5">
             {providers.map((provider) => (
                 <Button
                     key={provider.name}
                     variant="outline"
                     type="button"
                     asChild
-                    className="w-full border-white/10 bg-white/[0.02] text-slate-200 transition-all hover:border-cyan-400/40 hover:bg-cyan-400/5 hover:text-white hover:shadow-[0_0_18px_-6px_rgba(34,211,238,0.6)]"
+                    className="h-10 w-full justify-center gap-2.5 border-border/80 bg-background font-medium text-foreground shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground"
                 >
                     <a href={redirect(provider.name).url}>
                         {provider.icon}
